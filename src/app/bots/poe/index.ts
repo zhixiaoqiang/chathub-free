@@ -1,5 +1,7 @@
+import { t } from 'i18next'
 import WebSocketAsPromised from 'websocket-as-promised'
 import { requestHostPermission } from '~app/utils/permissions'
+import { PoeClaudeModel, PoeGPTModel } from '~services/user-config'
 import { ChatError, ErrorCode } from '~utils/errors'
 import { AbstractBot, SendMessageParams } from '../abstract-bot'
 import { GRAPHQL_QUERIES, PoeSettings, getChatId, getPoeSettings, gqlRequest } from './api'
@@ -31,12 +33,10 @@ interface ConversationContext {
 }
 
 export class PoeWebBot extends AbstractBot {
-  public botId: string
   private conversationContext?: ConversationContext
 
-  constructor(botId: string) {
+  constructor(public botId: string) {
     super()
-    this.botId = botId
   }
 
   async doSendMessage(params: SendMessageParams) {
@@ -131,7 +131,7 @@ export class PoeWebBot extends AbstractBot {
       throw new Error(JSON.stringify(resp.errors))
     }
     if (!resp.data.messageEdgeCreate.message) {
-      throw new Error('You’ve reached the daily free message limit for this model')
+      throw new ChatError(t('You’ve reached the daily free message limit for this model'), ErrorCode.POE_MESSAGE_LIMIT)
     }
   }
 
@@ -171,5 +171,23 @@ export class PoeWebBot extends AbstractBot {
     })
 
     return wsp
+  }
+
+  get name() {
+    if (this.botId === PoeGPTModel['GPT-3.5']) {
+      return 'ChatGPT (poe/gpt-3.5)'
+    }
+    if (this.botId === PoeGPTModel['GPT-4']) {
+      return 'ChatGPT (poe/gpt-4)'
+    }
+    if (this.botId === PoeClaudeModel['ClaudeInstant']) {
+      return 'Claude (poe/claude-instant)'
+    }
+    if (this.botId === PoeClaudeModel['ClaudePlus']) {
+      return 'Claude (poe/claude+)'
+    }
+    if (this.botId === PoeClaudeModel['ClaudeInstant100k']) {
+      return 'Claude (poe/claude-100k)'
+    }
   }
 }

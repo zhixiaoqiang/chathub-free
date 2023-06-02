@@ -7,6 +7,7 @@ import Button from '~app/components/Button'
 import ChatMessageInput from '~app/components/Chat/ChatMessageInput'
 import { useChat } from '~app/hooks/use-chat'
 import { useUserConfig } from '~app/hooks/use-user-config'
+import { trackEvent } from '~app/plausible'
 import { multiPanelBotsAtom } from '~app/state'
 import { MultiPanelLayout } from '~services/user-config'
 import { BotId } from '../bots'
@@ -24,6 +25,7 @@ const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }
       } else {
         uniqBy(chats, (c) => c.botId).forEach((c) => c.sendMessage(input))
       }
+      trackEvent('send_messages', { count: chats.length })
     },
     [chats],
   )
@@ -40,6 +42,7 @@ const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }
           <ConversationPanel
             key={`${chat.botId}-${index}`}
             botId={chat.botId}
+            bot={chat.bot}
             messages={chat.messages}
             onUserSendMessage={onUserSendMessage}
             generating={chat.generating}
@@ -52,7 +55,7 @@ const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }
       </div>
       <ChatMessageInput
         mode="full"
-        className="rounded-[20px] bg-primary-background px-5 py-[10px]"
+        className="rounded-[20px] bg-primary-background px-4 py-2"
         disabled={generating}
         onSubmit={onUserSendMessage}
         actionButton={!generating && <Button text={t('Send')} color="primary" type="submit" />}

@@ -57,7 +57,7 @@ function PremiumPage() {
       <h1 className="font-bold text-[40px] leading-none text-primary-text">{t('Premium')}</h1>
       {!premiumState.activated && (
         <p className="bg-[#FAE387] text-[#303030] w-fit rounded-[5px] px-2 py-[4px] text-sm font-semibold mt-9">
-          {t('Presale discount')}
+          {t('Earlybird price')}
         </p>
       )}
       {!premiumState.activated && (
@@ -73,7 +73,7 @@ function PremiumPage() {
         <FeatureItem text={t('More bots in All-In-One mode')} />
         <FeatureItem text={t('Chat history full-text search')} />
         <FeatureItem text={t('Customize theme')} />
-        <FeatureItem text={t('Quick access in Chrome side bar')} comingsoon />
+        <FeatureItem text={t('Quick access in Chrome side bar')} />
         <FeatureItem text={t('Activate up to 5 devices')} />
         <FeatureItem text={t('More features in the future')} />
         <FeatureItem text={t('Support the development of ChatHub')} />
@@ -88,7 +88,7 @@ function PremiumPage() {
       ) : (
         <div className="flex flex-row items-center gap-3 mt-8">
           <a
-            href="https://chathub.lemonsqueezy.com/checkout/buy/7f84853c-e84a-400e-94f4-ff0ca02fffb8"
+            href="https://chathub.gg/api/premium/redirect"
             target="_blank"
             rel="noreferrer"
             onClick={() => trackEvent('click_buy_premium')}
