@@ -1,15 +1,16 @@
-import { Link } from '@tanstack/react-router'
-import { FC, useCallback, useContext, useState } from 'react'
+import { FC, useCallback, useContext, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import Browser from 'webextension-polyfill'
 import { chatGPTClient } from '~app/bots/chatgpt-webapp/client'
 import { ConversationContext } from '~app/context'
 import { ChatError, ErrorCode } from '~utils/errors'
 import Button from '../Button'
 import MessageBubble from './MessageBubble'
-import { useTranslation } from 'react-i18next'
 
 const ChatGPTAuthErrorAction = () => {
   const [fixing, setFixing] = useState(false)
   const [fixed, setFixed] = useState(false)
+  const isSidePanel = useMemo(() => location.href.includes('sidepanel.html'), [])
 
   const fixChatGPT = useCallback(async () => {
     setFixing(true)
@@ -27,13 +28,18 @@ const ChatGPTAuthErrorAction = () => {
   if (fixed) {
     return <MessageBubble color="flat">Fixed, please retry chat</MessageBubble>
   }
+
   return (
     <div className="flex flex-row gap-2 items-center">
       <Button color="primary" text="Login & verify" onClick={fixChatGPT} isLoading={fixing} size="small" />
       <span className="text-sm text-primary-text">OR</span>
-      <Link to="/setting">
+      <a
+        href={Browser.runtime.getURL('app.html#/setting')}
+        target={isSidePanel ? '_blank' : undefined}
+        rel="noreferrer"
+      >
         <Button color="primary" text="Set api key" size="small" />
-      </Link>
+      </a>
     </div>
   )
 }
@@ -77,6 +83,13 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
       </a>
     )
   }
+  if (error.code === ErrorCode.CHATGPT_AUTH) {
+    return (
+      <a href="https://chat.openai.com" target="_blank" rel="noreferrer">
+        <Button color="primary" text={t('Login to ChatGPT')} size="small" />
+      </a>
+    )
+  }
   if (error.code === ErrorCode.CHATGPT_CLOUDFLARE || error.code === ErrorCode.CHATGPT_UNAUTHORIZED) {
     return <ChatGPTAuthErrorAction />
   }
@@ -87,6 +100,13 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
     return (
       <a href="https://bard.google.com" target="_blank" rel="noreferrer">
         <Button color="primary" text="Visit bard.google.com" size="small" />
+      </a>
+    )
+  }
+  if (error.code === ErrorCode.BING_CAPTCHA) {
+    return (
+      <a href="https://www.bing.com/turing/captcha/challenge" target="_blank" rel="noreferrer">
+        <Button color="primary" text={t('Verify')} size="small" />
       </a>
     )
   }

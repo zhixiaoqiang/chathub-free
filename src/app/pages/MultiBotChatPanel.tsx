@@ -1,24 +1,49 @@
 import cx from 'classnames'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 import { uniqBy } from 'lodash-es'
-import { FC, Suspense, useCallback, useMemo } from 'react'
+import { FC, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from '~app/components/Button'
 import ChatMessageInput from '~app/components/Chat/ChatMessageInput'
+import LayoutSwitch from '~app/components/Chat/LayoutSwitch'
+import PremiumFeatureModal from '~app/components/PremiumFeatureModal'
 import { useChat } from '~app/hooks/use-chat'
-import { useUserConfig } from '~app/hooks/use-user-config'
+import { usePremium } from '~app/hooks/use-premium'
 import { trackEvent } from '~app/plausible'
-import { multiPanelBotsAtom } from '~app/state'
-import { MultiPanelLayout } from '~services/user-config'
 import { BotId } from '../bots'
 import ConversationPanel from '../components/Chat/ConversationPanel'
 
-const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }) => {
+const layoutAtom = atomWithStorage<number>('multiPanelLayout', 2, undefined, { unstable_getOnInit: true })
+const twoPanelBotsAtom = atomWithStorage<BotId[]>('multiPanelBots:2', ['chatgpt', 'bing'])
+const threePanelBotsAtom = atomWithStorage<BotId[]>('multiPanelBots:3', ['chatgpt', 'bing', 'bard'])
+const fourPanelBotsAtom = atomWithStorage<BotId[]>('multiPanelBots:4', ['chatgpt', 'bing', 'claude', 'bard'])
+
+const GeneralChatPanel: FC<{
+  chats: ReturnType<typeof useChat>[]
+  botsAtom: typeof twoPanelBotsAtom
+}> = ({ chats, botsAtom }) => {
   const { t } = useTranslation()
   const generating = useMemo(() => chats.some((c) => c.generating), [chats])
+  const setBots = useSetAtom(botsAtom)
+  const setLayout = useSetAtom(layoutAtom)
+
+  const [premiumModalOpen, setPremiumModalOpen] = useState(false)
+  const premiumState = usePremium()
+  const disabled = useMemo(() => !premiumState.isLoading && !premiumState.activated, [premiumState])
+
+  useEffect(() => {
+    if (disabled && chats.length > 2) {
+      setPremiumModalOpen(true)
+    }
+  }, [chats.length, disabled])
 
   const onUserSendMessage = useCallback(
     (input: string, botId?: BotId) => {
+      if (disabled && chats.length > 2) {
+        setPremiumModalOpen(true)
+        return
+      }
       if (botId) {
         const chat = chats.find((c) => c.botId === botId)
         chat?.sendMessage(input)
@@ -27,7 +52,27 @@ const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }
       }
       trackEvent('send_messages', { count: chats.length })
     },
-    [chats],
+    [chats, disabled],
+  )
+
+  const onSwitchBot = useCallback(
+    (botId: BotId, index: number) => {
+      trackEvent('switch_bot', { botId, panel: chats.length })
+      setBots((bots) => {
+        const newBots = [...bots]
+        newBots[index] = botId
+        return newBots
+      })
+    },
+    [chats.length, setBots],
+  )
+
+  const onLayoutChange = useCallback(
+    (v: number) => {
+      trackEvent('switch_all_in_one_layout', { layout: v })
+      setLayout(v)
+    },
+    [setLayout],
   )
 
   return (
@@ -49,55 +94,59 @@ const GeneralChatPanel: FC<{ chats: ReturnType<typeof useChat>[] }> = ({ chats }
             stopGenerating={chat.stopGenerating}
             mode="compact"
             resetConversation={chat.resetConversation}
-            index={index}
+            onSwitchBot={(botId) => onSwitchBot(botId, index)}
           />
         ))}
       </div>
-      <ChatMessageInput
-        mode="full"
-        className="rounded-[20px] bg-primary-background px-4 py-2"
-        disabled={generating}
-        onSubmit={onUserSendMessage}
-        actionButton={!generating && <Button text={t('Send')} color="primary" type="submit" />}
-        autoFocus={true}
-      />
+      <div className="flex flex-row gap-3">
+        <LayoutSwitch layout={chats.length} onChange={onLayoutChange} />
+        <ChatMessageInput
+          mode="full"
+          className="rounded-[15px] bg-primary-background px-4 py-2 grow"
+          disabled={generating}
+          onSubmit={onUserSendMessage}
+          actionButton={!generating && <Button text={t('Send')} color="primary" type="submit" />}
+          autoFocus={true}
+        />
+      </div>
+      <PremiumFeatureModal open={premiumModalOpen} setOpen={setPremiumModalOpen} />
     </div>
   )
 }
 
-const TwoBotChatPanel: FC = () => {
-  const multiPanelBotIds = useAtomValue(multiPanelBotsAtom)
+const TwoBotChatPanel = () => {
+  const multiPanelBotIds = useAtomValue(twoPanelBotsAtom)
   const chat1 = useChat(multiPanelBotIds[0])
   const chat2 = useChat(multiPanelBotIds[1])
   const chats = useMemo(() => [chat1, chat2], [chat1, chat2])
-  return <GeneralChatPanel chats={chats} />
+  return <GeneralChatPanel chats={chats} botsAtom={twoPanelBotsAtom} />
 }
 
-const ThreeBotChatPanel: FC = () => {
-  const multiPanelBotIds = useAtomValue(multiPanelBotsAtom)
+const ThreeBotChatPanel = () => {
+  const multiPanelBotIds = useAtomValue(threePanelBotsAtom)
   const chat1 = useChat(multiPanelBotIds[0])
   const chat2 = useChat(multiPanelBotIds[1])
   const chat3 = useChat(multiPanelBotIds[2])
   const chats = useMemo(() => [chat1, chat2, chat3], [chat1, chat2, chat3])
-  return <GeneralChatPanel chats={chats} />
+  return <GeneralChatPanel chats={chats} botsAtom={threePanelBotsAtom} />
 }
 
-const FourBotChatPanel: FC = () => {
-  const multiPanelBotIds = useAtomValue(multiPanelBotsAtom)
+const FourBotChatPanel = () => {
+  const multiPanelBotIds = useAtomValue(fourPanelBotsAtom)
   const chat1 = useChat(multiPanelBotIds[0])
   const chat2 = useChat(multiPanelBotIds[1])
   const chat3 = useChat(multiPanelBotIds[2])
   const chat4 = useChat(multiPanelBotIds[3])
   const chats = useMemo(() => [chat1, chat2, chat3, chat4], [chat1, chat2, chat3, chat4])
-  return <GeneralChatPanel chats={chats} />
+  return <GeneralChatPanel chats={chats} botsAtom={fourPanelBotsAtom} />
 }
 
 const MultiBotChatPanel: FC = () => {
-  const { multiPanelLayout } = useUserConfig()
-  if (multiPanelLayout === MultiPanelLayout.Four) {
+  const layout = useAtomValue(layoutAtom)
+  if (layout === 4) {
     return <FourBotChatPanel />
   }
-  if (multiPanelLayout === MultiPanelLayout.Three) {
+  if (layout === 3) {
     return <ThreeBotChatPanel />
   }
   return <TwoBotChatPanel />

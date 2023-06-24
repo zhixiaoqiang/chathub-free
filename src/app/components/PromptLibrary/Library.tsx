@@ -40,7 +40,7 @@ const PromptItem = (props: {
   return (
     <div className="group relative flex items-center space-x-3 rounded-lg border border-primary-border bg-primary-background px-5 py-4 shadow-sm hover:border-gray-400">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-primary-text">{props.title}</p>
+        <p title={props.prompt} className="truncate text-sm font-medium text-primary-text">{props.title}</p>
       </div>
       <div className="flex flex-row gap-1">
         {props.edit && <ActionButton text={t('Edit')} onClick={props.edit} />}
@@ -58,8 +58,9 @@ const PromptItem = (props: {
   )
 }
 
-function PromptForm(props: { initialData: Prompt; onSubmit: (data: Prompt) => void }) {
+function PromptForm(props: { initialData: Prompt; onSubmit: (data: Prompt) => void; onClose: () => void }) {
   const { t } = useTranslation()
+
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
@@ -76,6 +77,7 @@ function PromptForm(props: { initialData: Prompt; onSubmit: (data: Prompt) => vo
     },
     [props],
   )
+
   return (
     <form className="flex flex-col gap-2 w-full" onSubmit={onSubmit}>
       <div className="w-full">
@@ -86,7 +88,10 @@ function PromptForm(props: { initialData: Prompt; onSubmit: (data: Prompt) => vo
         <span className="text-sm font-semibold block mb-1 text-primary-text">Prompt {t('Content')}</span>
         <Textarea className="w-full" name="prompt" defaultValue={props.initialData.prompt} />
       </div>
-      <Button color="primary" text={t('Save')} className="w-fit" size="small" type="submit" />
+      <div className="flex flex-row gap-2 mt-1">
+        <Button color="primary" text={t('Save')} className="w-fit" size="small" type="submit" />
+        <Button color="flat" text={t('Cancel')} className="w-fit" size="small" onClick={props.onClose} />
+      </div>
     </form>
   )
 }
@@ -128,7 +133,7 @@ function LocalPrompts(props: { insertPrompt: (text: string) => void }) {
               key={prompt.id}
               title={prompt.title}
               prompt={prompt.prompt}
-              edit={() => setFormData(prompt)}
+              edit={() => !formData && setFormData(prompt)}
               remove={() => removePrompt(prompt.id)}
               insertPrompt={props.insertPrompt}
             />
@@ -141,7 +146,7 @@ function LocalPrompts(props: { insertPrompt: (text: string) => void }) {
       )}
       <div className="mt-5">
         {formData ? (
-          <PromptForm initialData={formData} onSubmit={savePrompt} />
+          <PromptForm initialData={formData} onSubmit={savePrompt} onClose={() => setFormData(null)} />
         ) : (
           <Button text={t('Create new prompt')} size="small" onClick={create} />
         )}

@@ -86,7 +86,12 @@ export class PoeWebBot extends AbstractBot {
     wsp.onUnpackedMessage.addListener(onUnpackedMessageListener)
     wsp.onError.addListener(console.error)
 
-    await wsp.open()
+    try {
+      await wsp.open()
+    } catch (e) {
+      console.error('poe ws open error', e)
+      throw new ChatError('Failed to establish websocket connection.', ErrorCode.NETWORK_ERROR)
+    }
 
     try {
       await this.sendMessageRequest(params.prompt)
@@ -180,13 +185,13 @@ export class PoeWebBot extends AbstractBot {
     if (this.botId === PoeGPTModel['GPT-4']) {
       return 'ChatGPT (poe/gpt-4)'
     }
-    if (this.botId === PoeClaudeModel['ClaudeInstant']) {
+    if (this.botId === PoeClaudeModel['claude-instant']) {
       return 'Claude (poe/claude-instant)'
     }
-    if (this.botId === PoeClaudeModel['ClaudePlus']) {
+    if (this.botId === PoeClaudeModel['claude+']) {
       return 'Claude (poe/claude+)'
     }
-    if (this.botId === PoeClaudeModel['ClaudeInstant100k']) {
+    if (this.botId === PoeClaudeModel['claude-instant-100k']) {
       return 'Claude (poe/claude-100k)'
     }
   }

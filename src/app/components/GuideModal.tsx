@@ -20,7 +20,9 @@ const GuideModal: FC = () => {
 
   useEffect(() => {
     incrOpenTimes().then((t) => {
-      setOpen(t === 15 || (t > 0 && t % 50 === 0))
+      if (t === 15 || (t > 0 && t % 50 === 0)) {
+        setOpen(true)
+      }
       setOpenTimes(t)
     })
   }, [])
@@ -49,7 +51,12 @@ const GuideModal: FC = () => {
           <p className="font-semibold text-primary-text w-[300px] text-center">
             {t('You have opened ChatHub {{openTimes}} times, consider unlock all features?', { openTimes })}
           </p>
-          <Link to="/premium" onClick={() => setOpen(false)} className="focus-visible:outline-none">
+          <Link
+            to="/premium"
+            search={{ source: 'open-times' }}
+            onClick={() => setOpen(false)}
+            className="focus-visible:outline-none"
+          >
             <Button color="primary" text={t('Checkout premium features')} />
           </Link>
         </div>

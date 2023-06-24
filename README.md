@@ -49,7 +49,7 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](README_IN.md) &nbsp;&nbsp;|&nbsp;&
 
 ## ✨ Features
 
-- 🤖 Use different chatbots in one app, currently supporting ChatGPT, new Bing Chat, Google Bard, Claude (via Poe), Alpaca, Vicuna, ChatGLM, and will integrate more in the future
+- 🤖 Use different chatbots in one app, currently supporting ChatGPT, new Bing Chat, Google Bard, Claude, and 10+ open-source models including Alpaca, Vicuna, ChatGLM etc
 - 💬 Chat with multiple chatbots at the same time, making it easy to compare their answers
 - 🚀 Support ChatGPT API and GPT-4 Browsing
 - 🔍 Shortcut to quickly activate the app anywhere in the browser
@@ -70,6 +70,12 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](README_IN.md) &nbsp;&nbsp;|&nbsp;&
 * ChatGLM
 * Alpaca
 * Vicuna
+* Koala
+* Dolly
+* LLaMA
+* StableLM
+* OpenAssistant
+* ChatRWKV
 * ...
 
 ## 🔧 Manual Installation
@@ -88,6 +94,14 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](README_IN.md) &nbsp;&nbsp;|&nbsp;&
 - Load `dist` folder to browser by following steps in _Manual Installation_
 
 ## 📜 Changelog
+
+### v1.22.0
+
+- Support Claude API
+
+### v1.21.0
+
+- Add more open-source models
 
 ### v1.20.0
 

@@ -1,12 +1,18 @@
-import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { BiExport, BiImport } from 'react-icons/bi'
 import Browser from 'webextension-polyfill'
 import Button from '~app/components/Button'
+import RadioGroup from '~app/components/RadioGroup'
 import Select from '~app/components/Select'
 import ChatGPTAPISettings from '~app/components/Settings/ChatGPTAPISettings'
+import ChatGPTAzureSettings from '~app/components/Settings/ChatGPTAzureSettings'
+import ChatGPTPoeSettings from '~app/components/Settings/ChatGPTPoeSettings'
+import ChatGPWebSettings from '~app/components/Settings/ChatGPTWebSettings'
+import ClaudeAPISettings from '~app/components/Settings/ClaudeAPISettings'
+import ClaudePoeSettings from '~app/components/Settings/ClaudePoeSettings'
+import EnabledBotsSettings from '~app/components/Settings/EnabledBotsSettings'
 import KDB from '~app/components/Settings/KDB'
 import { ALL_IN_ONE_PAGE_ID, CHATBOTS } from '~app/consts'
 import { usePremium } from '~app/hooks/use-premium'
@@ -14,28 +20,18 @@ import { exportData, importData } from '~app/utils/export'
 import {
   BingConversationStyle,
   ChatGPTMode,
-  MultiPanelLayout,
-  PoeClaudeModel,
+  ClaudeMode,
   UserConfig,
   getUserConfig,
   updateUserConfig,
 } from '~services/user-config'
 import { getVersion } from '~utils'
 import PagePanel from '../components/Page'
-import ChatGPTAzureSettings from '~app/components/Settings/ChatGPTAzureSettings'
-import ChatGPWebSettings from '~app/components/Settings/ChatGPTWebSettings'
-import ChatGPTPoeSettings from '~app/components/Settings/ChatGPTPoeSettings'
 
 const BING_STYLE_OPTIONS = [
   { name: 'Precise', value: BingConversationStyle.Precise },
   { name: 'Balanced', value: BingConversationStyle.Balanced },
   { name: 'Creative', value: BingConversationStyle.Creative },
-]
-
-const POE_MODEL_OPTIONS = [
-  { name: 'Claude-Instant', value: PoeClaudeModel.ClaudeInstant },
-  { name: 'Claude+', value: PoeClaudeModel.ClaudePlus },
-  { name: 'Claude-instant-100k', value: PoeClaudeModel.ClaudeInstant100k },
 ]
 
 function SettingPage() {
@@ -131,47 +127,17 @@ function SettingPage() {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold text-lg">
-            {t('All-In-One Mode')}
-            {!premiumState.activated && (
-              <Link to="/premium" className="text-sm font-normal ml-2 underline italic">
-                ({t('Premium Feature')})
-              </Link>
-            )}
-          </p>
-          <div className="w-[200px]">
-            <Select
-              options={[
-                { name: t('Two in one'), value: MultiPanelLayout.Two },
-                { name: t('Three in one'), value: MultiPanelLayout.Three },
-                { name: t('Four in one'), value: MultiPanelLayout.Four },
-              ]}
-              value={userConfig.multiPanelLayout}
-              onChange={(v) => updateConfigValue({ multiPanelLayout: v })}
-              disabled={!premiumState.activated}
-            />
-          </div>
-        </div>
         <div className="flex flex-col gap-2">
+          <p className="font-bold text-lg">{t('Chatbots')}</p>
+          <EnabledBotsSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
+        </div>
+        <div className="flex flex-col gap-1">
           <p className="font-bold text-lg">ChatGPT</p>
-          <div className="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-3 mb-1">
-            {(Object.keys(ChatGPTMode) as (keyof typeof ChatGPTMode)[]).map((k) => (
-              <div className="flex items-center" key={k}>
-                <input
-                  id={k}
-                  type="radio"
-                  checked={userConfig.chatgptMode === ChatGPTMode[k]}
-                  className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                  value={ChatGPTMode[k]}
-                  onChange={(e) => updateConfigValue({ chatgptMode: e.currentTarget.value as ChatGPTMode })}
-                />
-                <label htmlFor={k} className="ml-2 block text-sm font-medium leading-6">
-                  {k} Mode
-                </label>
-              </div>
-            ))}
-          </div>
+          <RadioGroup
+            options={Object.entries(ChatGPTMode).map(([k, v]) => ({ label: `${k} Mode`, value: v }))}
+            value={userConfig.chatgptMode}
+            onChange={(v) => updateConfigValue({ chatgptMode: v as ChatGPTMode })}
+          />
           {userConfig.chatgptMode === ChatGPTMode.API ? (
             <ChatGPTAPISettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : userConfig.chatgptMode === ChatGPTMode.Azure ? (
@@ -180,6 +146,19 @@ function SettingPage() {
             <ChatGPTPoeSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : (
             <ChatGPWebSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
+          )}
+        </div>
+        <div className="flex flex-col gap-1">
+          <p className="font-bold text-lg">Claude</p>
+          <RadioGroup
+            options={Object.entries(ClaudeMode).map(([k, v]) => ({ label: `${k} Mode`, value: v }))}
+            value={userConfig.claudeMode}
+            onChange={(v) => updateConfigValue({ claudeMode: v as ClaudeMode })}
+          />
+          {userConfig.claudeMode === ClaudeMode.API ? (
+            <ClaudeAPISettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
+          ) : (
+            <ClaudePoeSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           )}
         </div>
         <div className="flex flex-col gap-1">
@@ -194,25 +173,6 @@ function SettingPage() {
               />
             </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-bold text-lg">Claude</p>
-          <div className="flex flex-row gap-3 items-center justify-between w-[250px]">
-            <p className="font-medium text-base">{t('Model')}</p>
-            <div className="w-[200px]">
-              <Select
-                options={POE_MODEL_OPTIONS}
-                value={userConfig.poeModel}
-                onChange={(v) => updateConfigValue({ poeModel: v })}
-              />
-            </div>
-          </div>
-          {userConfig.poeModel === PoeClaudeModel.ClaudePlus && (
-            <p className="text-sm mt-1 text-secondary-text">{t('Limited Access')}</p>
-          )}
-          {userConfig.poeModel === PoeClaudeModel.ClaudeInstant100k && (
-            <p className="text-sm mt-1 text-secondary-text">{t('Poe subscribers only')}</p>
-          )}
         </div>
       </div>
       <Button color={dirty ? 'primary' : 'flat'} text={t('Save')} className="w-fit my-8" onClick={save} />

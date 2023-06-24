@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
 const resources = {
-  zh: {
+  'zh-CN': {
     translation: {
       'Shortcut to open this app': '打开ChatHub的快捷键',
       Settings: '设置',
@@ -24,6 +24,7 @@ const resources = {
       Content: '内容',
       Search: '搜索',
       Model: '模型',
+      Cancel: '取消',
       'Presale discount': '预售折扣',
       'More bots in All-In-One mode': '在All-In-One模式下使用更多chatbot（三合一、四合一）',
       'Chat history full-text search': '全文搜索聊天记录',
@@ -40,7 +41,7 @@ const resources = {
       'Four in one': '四合一',
       'Activate up to 5 devices': '最多可激活5台设备',
       Deactivate: '反激活',
-      'Get premium license': '购买 premium license',
+      'Get premium license': '购买会员',
       'Theme Settings': '主题设置',
       'Theme Mode': '主题模式',
       'Theme Color': '主题色',
@@ -73,6 +74,13 @@ const resources = {
       'Display size': '显示大小',
       'You’ve reached the daily free message limit for this model': '你已经达到了该模型今日免费消息上限',
       'This is a limitation set by poe.com': '这是poe.com的限制',
+      Feedback: '反馈',
+      Theme: '主题',
+      Premium: '付费会员',
+      Chatbots: '聊天机器人',
+      'Manage order and devices': '管理订单与设备',
+      'Upgrade to premium to chat with more than two bots at once': '升级会员，同时和两个以上的机器人聊天',
+      Upgrade: '升级',
     },
   },
   de: {

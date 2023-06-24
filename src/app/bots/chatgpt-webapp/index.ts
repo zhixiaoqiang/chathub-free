@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { ChatGPTWebModel } from '~services/user-config'
+import { ChatError, ErrorCode } from '~utils/errors'
 import { parseSSEResponse } from '~utils/sse'
 import { AbstractBot, SendMessageParams } from '../abstract-bot'
 import { chatGPTClient } from './client'
@@ -24,7 +25,7 @@ export class ChatGPTWebBot extends AbstractBot {
 
   private async getModelName(): Promise<string> {
     if (this.model === ChatGPTWebModel['GPT-4']) {
-      return 'gpt-4'
+      return 'gpt-4-mobile'
     }
     if (this.model === ChatGPTWebModel['GPT-4 Browsing']) {
       return 'gpt-4-browsing'
@@ -106,6 +107,11 @@ export class ChatGPTWebBot extends AbstractBot {
           data: { text },
         })
       }
+    }).catch((err: Error) => {
+      if (err.message.includes('token_expired')) {
+        throw new ChatError(err.message, ErrorCode.CHATGPT_AUTH)
+      }
+      throw err
     })
   }
 
