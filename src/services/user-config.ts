@@ -1,7 +1,7 @@
 import { defaults } from 'lodash-es'
 import Browser from 'webextension-polyfill'
 import { BotId } from '~app/bots'
-import { ALL_IN_ONE_PAGE_ID, CHATBOTS, CHATGPT_API_MODELS } from '~app/consts'
+import { ALL_IN_ONE_PAGE_ID, CHATBOTS, CHATGPT_API_MODELS, DEFAULT_CHATGPT_SYSTEM_MESSAGE } from '~app/consts'
 
 export enum BingConversationStyle {
   Creative = 'creative',
@@ -18,10 +18,7 @@ export enum ChatGPTMode {
 
 export enum ChatGPTWebModel {
   'GPT-3.5' = 'gpt-3.5',
-  'GPT-3.5 (Mobile)' = 'gpt-3.5-mobile',
   'GPT-4' = 'gpt-4',
-  'GPT-4 (Mobile)' = 'gpt-4-mobile',
-  'GPT-4 Browsing' = 'gpt-4-browsing',
 }
 
 export enum PoeGPTModel {
@@ -41,10 +38,10 @@ export enum ClaudeMode {
 }
 
 export enum ClaudeAPIModel {
-  'claude-instant-v1' = 'claude-instant-v1',
-  'claude-v1' = 'claude-v1',
-  'claude-v1-100k' = 'claude-v1-100k',
-  'claude-instant-v1-100k' = 'claude-instant-v1-100k',
+  'claude-instant-1' = 'claude-instant-v1',
+  'claude-1' = 'claude-v1',
+  'claude-1-100k' = 'claude-v1-100k',
+  'claude-instant-1-100k' = 'claude-instant-v1-100k',
 }
 
 const userConfigWithDefaultValue = {
@@ -52,6 +49,7 @@ const userConfigWithDefaultValue = {
   openaiApiHost: 'https://api.openai.com',
   chatgptApiModel: CHATGPT_API_MODELS[0] as (typeof CHATGPT_API_MODELS)[number],
   chatgptApiTemperature: 1,
+  chatgptApiSystemMessage: DEFAULT_CHATGPT_SYSTEM_MESSAGE,
   chatgptMode: ChatGPTMode.Webapp,
   chatgptWebappModelName: ChatGPTWebModel['GPT-3.5'],
   chatgptPoeModelName: PoeGPTModel['GPT-3.5'],
@@ -64,7 +62,7 @@ const userConfigWithDefaultValue = {
   enabledBots: Object.keys(CHATBOTS).slice(0, 8) as BotId[],
   claudeApiKey: '',
   claudeMode: ClaudeMode.Poe,
-  claudeApiModel: ClaudeAPIModel['claude-instant-v1'],
+  claudeApiModel: ClaudeAPIModel['claude-instant-1'],
 }
 
 export type UserConfig = typeof userConfigWithDefaultValue
@@ -76,6 +74,12 @@ export async function getUserConfig(): Promise<UserConfig> {
   }
   if (result.chatgptWebappModelName === 'default') {
     result.chatgptWebappModelName = ChatGPTWebModel['GPT-3.5']
+  } else if (result.chatgptWebappModelName === 'gpt-4-browsing') {
+    result.chatgptWebappModelName = ChatGPTWebModel['GPT-4']
+  } else if (result.chatgptWebappModelName === 'gpt-3.5-mobile') {
+    result.chatgptWebappModelName = ChatGPTWebModel['GPT-3.5']
+  } else if (result.chatgptWebappModelName === 'gpt-4-mobile') {
+    result.chatgptWebappModelName = ChatGPTWebModel['GPT-4']
   }
   return defaults(result, userConfigWithDefaultValue)
 }

@@ -110,6 +110,23 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
       </a>
     )
   }
+  if (error.code === ErrorCode.LMSYS_SESSION_EXPIRED) {
+    return (
+      <a href="https://chat.lmsys.org" target="_blank" rel="noreferrer">
+        <Button color="primary" text={t('Refresh session')} size="small" />
+      </a>
+    )
+  }
+  if (error.code === ErrorCode.CHATGPT_INSUFFICIENT_QUOTA) {
+    return (
+      <p className="ml-2 text-secondary-text text-sm">
+        {t('This usually mean you need to add a payment method to your OpenAI account, checkout: ')}
+        <a href="https://platform.openai.com/account/billing/" target="_blank" rel="noreferrer" className="underline">
+          OpenAI billing
+        </a>
+      </p>
+    )
+  }
   if (
     error.code === ErrorCode.NETWORK_ERROR ||
     (error.code === ErrorCode.UNKOWN_ERROR && error.message.includes('Failed to fetch'))
@@ -119,6 +136,7 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
   if (error.code === ErrorCode.POE_MESSAGE_LIMIT) {
     return <p className="ml-2 text-secondary-text text-sm">{t('This is a limitation set by poe.com')}</p>
   }
+
   return null
 }
 
