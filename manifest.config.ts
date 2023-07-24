@@ -6,7 +6,7 @@ export default defineManifest(async (env) => {
     name: '__MSG_appName__',
     description: '__MSG_appDesc__',
     default_locale: 'en',
-    version: '1.26.1',
+    version: '1.31.0',
     icons: {
       '16': 'src/assets/icon.png',
       '32': 'src/assets/icon.png',
@@ -25,7 +25,7 @@ export default defineManifest(async (env) => {
       'https://*.chathub.gg/',
     ],
     optional_host_permissions: ['https://*/*'],
-    permissions: ['storage', 'unlimitedStorage', 'sidePanel'],
+    permissions: ['storage', 'unlimitedStorage', 'sidePanel', 'declarativeNetRequestWithHostAccess'],
     content_scripts: [
       {
         matches: ['https://chat.openai.com/*'],
@@ -45,6 +45,15 @@ export default defineManifest(async (env) => {
     },
     side_panel: {
       default_path: 'sidepanel.html',
+    },
+    declarative_net_request: {
+      rule_resources: [
+        {
+          id: 'ruleset_bing',
+          enabled: true,
+          path: 'src/rules/bing.json',
+        },
+      ],
     },
   }
 })
