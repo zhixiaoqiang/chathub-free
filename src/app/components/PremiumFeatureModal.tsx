@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from './Button'
 import Dialog from './Dialog'
@@ -7,6 +7,8 @@ import Dialog from './Dialog'
 interface Props {
   open: boolean
   setOpen: (open: boolean) => void
+  content: string | ReactNode
+  source?: string
 }
 
 const PremiumFeatureModal: FC<Props> = (props) => {
@@ -16,15 +18,17 @@ const PremiumFeatureModal: FC<Props> = (props) => {
       title={`🔒 ${t('Premium Feature')}`}
       open={props.open}
       onClose={() => props.setOpen(false)}
-      className="rounded-2xl w-[500px]"
+      className="w-[500px] rounded-xl"
     >
       <div className="flex flex-col items-center gap-4 py-5">
-        <p className="font-semibold text-primary-text text-center w-[70%]">
-          {t('Upgrade to premium to chat with more than two bots at once')}
-        </p>
+        {typeof props.content === 'string' ? (
+          <p className="font-semibold text-primary-text text-center w-[70%]">{props.content}</p>
+        ) : (
+          props.content
+        )}
         <Link
           to="/premium"
-          search={{ source: 'all-in-one-modal' }}
+          search={{ source: props.source }}
           onClick={() => props.setOpen(false)}
           className="focus-visible:outline-none"
         >

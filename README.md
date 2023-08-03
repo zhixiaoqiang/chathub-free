@@ -59,24 +59,26 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](README_IN.md) &nbsp;&nbsp;|&nbsp;&
 - 📥 Export and Import all your data
 - 🔗 Share conversation to markdown
 - 🌙 Dark mode
+- 🌐 Web access
 
 ## 🤖 Supported Bots
 
-* ChatGPT (via Webapp/API/Azure/Poe)
-* Bing Chat
-* Google Bard
-* Claude (via Poe)
-* iFlytek Spark
-* ChatGLM
-* Alpaca
-* Vicuna
-* Koala
-* Dolly
-* LLaMA
-* StableLM
-* OpenAssistant
-* ChatRWKV
-* ...
+- ChatGPT (via Webapp/API/Azure/Poe)
+- Bing Chat
+- Google Bard
+- Claude 2 (via Webapp/API/Poe)
+- iFlytek Spark
+- ChatGLM
+- Pi by Inflection
+- Alpaca
+- Vicuna
+- Koala
+- Dolly
+- LLaMA
+- StableLM
+- OpenAssistant
+- ChatRWKV
+- ...
 
 ## 🔧 Manual Installation
 

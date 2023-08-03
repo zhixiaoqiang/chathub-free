@@ -8,7 +8,9 @@ function extractFromHTML(variableName: string, html: string) {
 }
 
 export async function fetchRequestParams() {
-  const html = await ofetch('https://bard.google.com/faq')
+  const html = await ofetch('https://bard.google.com/faq', {
+    cache: 'reload',
+  })
   const atValue = extractFromHTML('SNlM0e', html)
   const blValue = extractFromHTML('cfb2h', html)
   return { atValue, blValue }
@@ -18,7 +20,7 @@ export function parseBardResponse(resp: string) {
   const data = JSON.parse(resp.split('\n')[3])
   const payload = JSON.parse(data[0][2])
   if (!payload) {
-    throw new ChatError('Failed to access Bard', ErrorCode.BARD_EMPTY_RESPONSE)
+    throw new ChatError("Bard isn't currently supported in your country", ErrorCode.BARD_EMPTY_RESPONSE)
   }
   console.debug('bard response payload', payload)
 

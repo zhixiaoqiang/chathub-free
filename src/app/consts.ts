@@ -4,15 +4,14 @@ import bardLogo from '~/assets/bard-logo.svg'
 import bingLogo from '~/assets/bing-logo.svg'
 import chatglmLogo from '~/assets/chatglm-logo.svg'
 import chatgptLogo from '~/assets/chatgpt-logo.svg'
-import vicunaLogo from '~/assets/vicuna-logo.jpg'
-import xunfeiLogo from '~/assets/xunfei-logo.png'
-import koalaLogo from '~/assets/koala-logo.jpg'
-import dollyLogo from '~/assets/dolly-logo.png'
+import guanacoLogo from '~/assets/guanaco-logo.png'
 import llamaLogo from '~/assets/llama-logo.png'
-import stablelmLogo from '~/assets/stablelm-logo.png'
 import oasstLogo from '~/assets/oasst-logo.svg'
-import rwkvLogo from '~/assets/rwkv-logo.png'
 import piLogo from '~/assets/pi-logo.png'
+import rwkvLogo from '~/assets/rwkv-logo.png'
+import vicunaLogo from '~/assets/vicuna-logo.jpg'
+import wizardlmLogo from '~/assets/wizardlm-logo.png'
+import xunfeiLogo from '~/assets/xunfei-logo.png'
 import { BotId } from './bots'
 import i18n from './i18n'
 
@@ -33,17 +32,9 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
     name: 'Claude',
     avatar: claudeLogo,
   },
-  xunfei: {
-    name: i18n.t('iFlytek Spark'),
-    avatar: xunfeiLogo,
-  },
-  chatglm: {
-    name: 'ChatGLM',
-    avatar: chatglmLogo,
-  },
-  pi: {
-    name: 'Pi',
-    avatar: piLogo,
+  llama: {
+    name: 'Llama 2',
+    avatar: llamaLogo,
   },
   alpaca: {
     name: 'Alpaca',
@@ -53,21 +44,17 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
     name: 'Vicuna',
     avatar: vicunaLogo,
   },
-  koala: {
-    name: 'Koala',
-    avatar: koalaLogo,
+  pi: {
+    name: 'Pi',
+    avatar: piLogo,
   },
-  dolly: {
-    name: 'Dolly',
-    avatar: dollyLogo,
+  chatglm: {
+    name: 'ChatGLM',
+    avatar: chatglmLogo,
   },
-  llama: {
-    name: 'LLaMA',
-    avatar: llamaLogo,
-  },
-  stablelm: {
-    name: 'StableLM',
-    avatar: stablelmLogo,
+  xunfei: {
+    name: i18n.t('iFlytek Spark'),
+    avatar: xunfeiLogo,
   },
   oasst: {
     name: 'OpenAssistant',
@@ -77,6 +64,14 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
     name: 'ChatRWKV',
     avatar: rwkvLogo,
   },
+  guanaco: {
+    name: 'Guanaco',
+    avatar: guanacoLogo,
+  },
+  wizardlm: {
+    name: 'WizardLM',
+    avatar: wizardlmLogo,
+  },
 }
 
 export const CHATGPT_HOME_URL = 'https://chat.openai.com'
@@ -85,3 +80,5 @@ export const ALL_IN_ONE_PAGE_ID = 'all'
 
 export const DEFAULT_CHATGPT_SYSTEM_MESSAGE =
   'You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: 2021-09-01. Current date: {current_date}'
+
+export type Layout = 2 | 3 | 4 | 'imageInput'
