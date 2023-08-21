@@ -1,28 +1,10 @@
 import { ofetch } from 'ofetch'
-
-type ActivateResponse =
-  | {
-      activated: true
-      instance: { id: string }
-      meta: {
-        product_id: number
-      }
-    }
-  | { activated: false; error: string }
+import * as serverApi from '~services/server-api'
 
 async function activateLicense(key: string, instanceName: string) {
-  const resp = await ofetch<ActivateResponse>('https://api.lemonsqueezy.com/v1/licenses/activate', {
-    method: 'POST',
-    body: {
-      license_key: key,
-      instance_name: instanceName,
-    },
-  })
+  const resp = await serverApi.activateLicense(key, instanceName)
   if (!resp.activated) {
     throw new Error(resp.error)
-  }
-  if (resp.meta.product_id !== 58153) {
-    throw new Error('Unmatching product')
   }
   return resp.instance.id
 }

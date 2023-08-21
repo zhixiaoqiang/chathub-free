@@ -1,4 +1,4 @@
-import cx from 'classnames'
+import { cx } from '~/utils'
 import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clearIcon from '~/assets/icons/clear.svg'
@@ -70,17 +70,11 @@ const ConversationPanel: FC<Props> = (props) => {
   let inputActionButton: ReactNode = null
   if (props.generating) {
     inputActionButton = (
-      <Button
-        text={t('Stop')}
-        color="flat"
-        size={mode === 'full' ? 'normal' : 'small'}
-        onClick={props.stopGenerating}
-      />
+      <Button text={t('Stop')} color="flat" size={mode === 'full' ? 'normal' : 'tiny'} onClick={props.stopGenerating} />
     )
   } else if (mode === 'full') {
     inputActionButton = (
       <div className="flex flex-row items-center gap-[10px] shrink-0">
-        <WebAccessCheckbox botId={props.botId} key={props.botId} />
         <Button text={t('Send')} color="primary" type="submit" />
       </div>
     )
@@ -88,22 +82,23 @@ const ConversationPanel: FC<Props> = (props) => {
 
   return (
     <ConversationContext.Provider value={context}>
-      <div className={cx('flex flex-col overflow-hidden bg-primary-background h-full rounded-[20px]')}>
+      <div className={cx('flex flex-col overflow-hidden bg-primary-background h-full rounded-2xl')}>
         <div
           className={cx(
             'border-b border-solid border-primary-border flex flex-row items-center justify-between gap-2 py-[10px]',
             marginClass,
           )}
         >
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center">
             <img src={botInfo.avatar} className="w-[18px] h-[18px] object-contain rounded-full" />
             <Tooltip content={props.bot.name || botInfo.name}>
-              <span className="font-semibold text-primary-text text-sm cursor-default">{botInfo.name}</span>
+              <span className="font-semibold text-primary-text text-sm cursor-default ml-2 mr-1">{botInfo.name}</span>
             </Tooltip>
             {mode === 'compact' && props.onSwitchBot && (
               <SwitchBotDropdown selectedBotId={props.botId} onChange={props.onSwitchBot} />
             )}
           </div>
+          <WebAccessCheckbox botId={props.botId} />
           <div className="flex flex-row items-center gap-3">
             <Tooltip content={t('Share conversation')}>
               <img src={shareIcon} className="w-5 h-5 cursor-pointer" onClick={openShareDialog} />
@@ -121,9 +116,11 @@ const ConversationPanel: FC<Props> = (props) => {
           </div>
         </div>
         <ChatMessageList botId={props.botId} messages={props.messages} className={marginClass} />
-        <div className={cx('mt-3 flex flex-col', marginClass, mode === 'full' ? 'mb-3' : 'mb-[5px]')}>
+        <div className={cx('mt-3 flex flex-col ', marginClass, mode === 'full' ? 'mb-3' : 'mb-[5px]')}>
           <div className={cx('flex flex-row items-center gap-[5px]', mode === 'full' ? 'mb-3' : 'mb-0')}>
-            {mode === 'compact' && <span className="font-medium text-xs text-light-text">Send to {botInfo.name}</span>}
+            {mode === 'compact' && (
+              <span className="font-medium text-xs text-light-text cursor-default">Send to {botInfo.name}</span>
+            )}
             <hr className="grow border-primary-border" />
           </div>
           <ChatMessageInput

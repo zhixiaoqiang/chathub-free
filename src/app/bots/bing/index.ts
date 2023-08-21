@@ -139,6 +139,14 @@ export class BingWebBot extends AbstractBot {
         } else if (event.type === 2) {
           const messages = event.item.messages as ChatResponseMessage[] | undefined
           if (!messages) {
+            if (event.item.result.value === 'UnauthorizedRequest') {
+              this.conversationContext = undefined
+              params.onEvent({
+                type: 'ERROR',
+                error: new ChatError('UnauthorizedRequest', ErrorCode.BING_UNAUTHORIZED),
+              })
+              return
+            }
             const captcha = event.item.result.value === 'CaptchaChallenge'
             if (captcha) {
               this.conversationContext = undefined
@@ -187,7 +195,13 @@ export class BingWebBot extends AbstractBot {
       wsp.close()
     })
 
-    await wsp.open()
+    try {
+      await wsp.open()
+    } catch (err) {
+      wsp.removeAllListeners()
+      throw new ChatError((err as Error).message, ErrorCode.NETWORK_ERROR)
+    }
+
     wsp.sendPacked({ protocol: 'json', version: 1 })
   }
 

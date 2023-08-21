@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import cx from 'classnames'
+import { cx } from '~/utils'
 import { useAtom } from 'jotai'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -85,7 +85,7 @@ function Sidebar() {
             </Tooltip>
           )}
           {!collapsed && (
-            <Tooltip content={t('Theme')}>
+            <Tooltip content={t('Display')}>
               <a onClick={() => setThemeSettingModalOpen(true)}>
                 <IconButton icon={themeIcon} />
               </a>

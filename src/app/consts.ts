@@ -13,7 +13,6 @@ import vicunaLogo from '~/assets/vicuna-logo.jpg'
 import wizardlmLogo from '~/assets/wizardlm-logo.png'
 import xunfeiLogo from '~/assets/xunfei-logo.png'
 import { BotId } from './bots'
-import i18n from './i18n'
 
 export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
   chatgpt: {
@@ -49,11 +48,11 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
     avatar: piLogo,
   },
   chatglm: {
-    name: 'ChatGLM',
+    name: 'ChatGLM2',
     avatar: chatglmLogo,
   },
   xunfei: {
-    name: i18n.t('iFlytek Spark'),
+    name: 'iFlytek Spark',
     avatar: xunfeiLogo,
   },
   oasst: {
@@ -81,4 +80,4 @@ export const ALL_IN_ONE_PAGE_ID = 'all'
 export const DEFAULT_CHATGPT_SYSTEM_MESSAGE =
   'You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: 2021-09-01. Current date: {current_date}'
 
-export type Layout = 2 | 3 | 4 | 'imageInput'
+export type Layout = 2 | 3 | 4 | 'imageInput' | 'twoVertical' | 'sixGrid' // twoVertical is deprecated
