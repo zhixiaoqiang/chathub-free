@@ -1,6 +1,6 @@
 import { parseSSEResponse } from '~utils/sse'
 import { AbstractBot, SendMessageParams } from '../abstract-bot'
-import { createConversation, fetchOrganizationId } from './api'
+import { createConversation, fetchOrganizationId, generateChatTitle } from './api'
 import { requestHostPermission } from '~app/utils/permissions'
 import { ChatError, ErrorCode } from '~utils/errors'
 
@@ -24,6 +24,7 @@ export class ClaudeWebBot extends AbstractBot {
     if (!this.conversationContext) {
       const conversationId = await createConversation(this.organizationId)
       this.conversationContext = { conversationId }
+      generateChatTitle(this.organizationId, conversationId, params.prompt).catch(console.error)
     }
 
     const resp = await fetch('https://claude.ai/api/append_message', {
@@ -44,14 +45,19 @@ export class ClaudeWebBot extends AbstractBot {
       }),
     })
 
+    let result = ''
+
     await parseSSEResponse(resp, (message) => {
       console.debug('claude sse message', message)
       const payload = JSON.parse(message)
       if (payload.completion) {
+        result += payload.completion
         params.onEvent({
           type: 'UPDATE_ANSWER',
-          data: { text: payload.completion.trimStart() },
+          data: { text: result.trimStart() },
         })
+      } else if (payload.error) {
+        throw new Error(JSON.stringify(payload.error))
       }
     })
 

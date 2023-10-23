@@ -1,9 +1,10 @@
-import cx from 'classnames'
-import { FC, useCallback, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clearIcon from '~/assets/icons/clear.svg'
 import historyIcon from '~/assets/icons/history.svg'
 import shareIcon from '~/assets/icons/share.svg'
+import { cx } from '~/utils'
 import { CHATBOTS } from '~app/consts'
 import { ConversationContext, ConversationContextValue } from '~app/context'
 import { trackEvent } from '~app/plausible'
@@ -16,6 +17,8 @@ import SwitchBotDropdown from '../SwitchBotDropdown'
 import Tooltip from '../Tooltip'
 import ChatMessageInput from './ChatMessageInput'
 import ChatMessageList from './ChatMessageList'
+import WebAccessCheckbox from './WebAccessCheckbox'
+import ChatbotName from './ChatbotName'
 
 interface Props {
   botId: BotId
@@ -66,44 +69,75 @@ const ConversationPanel: FC<Props> = (props) => {
     trackEvent('open_share_dialog', { botId: props.botId })
   }, [props.botId])
 
+  let inputActionButton: ReactNode = null
+  if (props.generating) {
+    inputActionButton = (
+      <Button text={t('Stop')} color="flat" size={mode === 'full' ? 'normal' : 'tiny'} onClick={props.stopGenerating} />
+    )
+  } else if (mode === 'full') {
+    inputActionButton = (
+      <div className="flex flex-row items-center gap-[10px] shrink-0">
+        <Button text={t('Send')} color="primary" type="submit" />
+      </div>
+    )
+  }
+
   return (
     <ConversationContext.Provider value={context}>
-      <div className={cx('flex flex-col overflow-hidden bg-primary-background h-full rounded-[20px]')}>
+      <div className={cx('flex flex-col overflow-hidden bg-primary-background h-full rounded-2xl')}>
         <div
           className={cx(
             'border-b border-solid border-primary-border flex flex-row items-center justify-between gap-2 py-[10px]',
             marginClass,
           )}
         >
-          <div className="flex flex-row items-center gap-2">
-            <img src={botInfo.avatar} className="w-[18px] h-[18px] object-contain rounded-full" />
-            <Tooltip content={props.bot.name || botInfo.name}>
-              <span className="font-semibold text-primary-text text-sm cursor-default">{botInfo.name}</span>
-            </Tooltip>
-            {mode === 'compact' && props.onSwitchBot && (
-              <SwitchBotDropdown selectedBotId={props.botId} onChange={props.onSwitchBot} />
-            )}
+          <div className="flex flex-row items-center">
+            <motion.img
+              src={botInfo.avatar}
+              className="w-[18px] h-[18px] object-contain rounded-full mr-2"
+              whileHover={{ rotate: 180 }}
+            />
+            <ChatbotName
+              botId={props.botId}
+              name={botInfo.name}
+              fullName={props.bot.name}
+              onSwitchBot={mode === 'compact' ? props.onSwitchBot : undefined}
+            />
           </div>
+          <WebAccessCheckbox botId={props.botId} />
           <div className="flex flex-row items-center gap-3">
             <Tooltip content={t('Share conversation')}>
-              <img src={shareIcon} className="w-5 h-5 cursor-pointer" onClick={openShareDialog} />
+              <motion.img
+                src={shareIcon}
+                className="w-5 h-5 cursor-pointer"
+                onClick={openShareDialog}
+                whileHover={{ scale: 1.1 }}
+              />
             </Tooltip>
             <Tooltip content={t('Clear conversation')}>
-              <img
+              <motion.img
                 src={clearIcon}
                 className={cx('w-5 h-5', props.generating ? 'cursor-not-allowed' : 'cursor-pointer')}
                 onClick={resetConversation}
+                whileHover={{ scale: 1.1 }}
               />
             </Tooltip>
             <Tooltip content={t('View history')}>
-              <img src={historyIcon} className="w-5 h-5 cursor-pointer" onClick={openHistoryDialog} />
+              <motion.img
+                src={historyIcon}
+                className="w-5 h-5 cursor-pointer"
+                onClick={openHistoryDialog}
+                whileHover={{ scale: 1.1 }}
+              />
             </Tooltip>
           </div>
         </div>
         <ChatMessageList botId={props.botId} messages={props.messages} className={marginClass} />
-        <div className={cx('mt-3 flex flex-col', marginClass, mode === 'full' ? 'mb-3' : 'mb-[5px]')}>
+        <div className={cx('mt-3 flex flex-col ', marginClass, mode === 'full' ? 'mb-3' : 'mb-[5px]')}>
           <div className={cx('flex flex-row items-center gap-[5px]', mode === 'full' ? 'mb-3' : 'mb-0')}>
-            {mode === 'compact' && <span className="font-medium text-xs text-light-text">Send to {botInfo.name}</span>}
+            {mode === 'compact' && (
+              <span className="font-medium text-xs text-light-text cursor-default">Send to {botInfo.name}</span>
+            )}
             <hr className="grow border-primary-border" />
           </div>
           <ChatMessageInput
@@ -113,25 +147,14 @@ const ConversationPanel: FC<Props> = (props) => {
             onSubmit={onSubmit}
             autoFocus={mode === 'full'}
             supportImageInput={mode === 'full' && (props.botId === 'bard' || props.botId === 'bing')}
-            actionButton={
-              props.generating ? (
-                <Button
-                  text={t('Stop')}
-                  color="flat"
-                  size={mode === 'full' ? 'normal' : 'small'}
-                  onClick={props.stopGenerating}
-                />
-              ) : (
-                mode === 'full' && <Button text={t('Send')} color="primary" type="submit" />
-              )
-            }
+            actionButton={inputActionButton}
           />
         </div>
       </div>
-      {showHistory && <HistoryDialog botId={props.botId} open={true} onClose={() => setShowHistory(false)} />}
       {showShareDialog && (
         <ShareDialog open={true} onClose={() => setShowShareDialog(false)} messages={props.messages} />
       )}
+      {showHistory && <HistoryDialog botId={props.botId} open={true} onClose={() => setShowHistory(false)} />}
     </ConversationContext.Provider>
   )
 }

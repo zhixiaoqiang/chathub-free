@@ -8,14 +8,16 @@ import RadioGroup from '~app/components/RadioGroup'
 import Select from '~app/components/Select'
 import ChatGPTAPISettings from '~app/components/Settings/ChatGPTAPISettings'
 import ChatGPTAzureSettings from '~app/components/Settings/ChatGPTAzureSettings'
+import ChatGPTOpenRouterSettings from '~app/components/Settings/ChatGPTOpenRouterSettings'
 import ChatGPTPoeSettings from '~app/components/Settings/ChatGPTPoeSettings'
 import ChatGPWebSettings from '~app/components/Settings/ChatGPTWebSettings'
 import ClaudeAPISettings from '~app/components/Settings/ClaudeAPISettings'
+import ClaudeOpenRouterSettings from '~app/components/Settings/ClaudeOpenRouterSettings'
 import ClaudePoeSettings from '~app/components/Settings/ClaudePoeSettings'
+import ClaudeWebappSettings from '~app/components/Settings/ClaudeWebappSettings'
 import EnabledBotsSettings from '~app/components/Settings/EnabledBotsSettings'
 import KDB from '~app/components/Settings/KDB'
 import { ALL_IN_ONE_PAGE_ID, CHATBOTS } from '~app/consts'
-import { usePremium } from '~app/hooks/use-premium'
 import { exportData, importData } from '~app/utils/export'
 import {
   BingConversationStyle,
@@ -27,7 +29,6 @@ import {
 } from '~services/user-config'
 import { getVersion } from '~utils'
 import PagePanel from '../components/Page'
-import ClaudeWebappSettings from '~app/components/Settings/ClaudeWebappSettings'
 
 const BING_STYLE_OPTIONS = [
   { name: 'Precise', value: BingConversationStyle.Precise },
@@ -40,7 +41,6 @@ function SettingPage() {
   const [shortcuts, setShortcuts] = useState<string[]>([])
   const [userConfig, setUserConfig] = useState<UserConfig | undefined>(undefined)
   const [dirty, setDirty] = useState(false)
-  const premiumState = usePremium()
 
   useEffect(() => {
     Browser.commands.getAll().then((commands) => {
@@ -135,7 +135,7 @@ function SettingPage() {
         <div className="flex flex-col gap-1">
           <p className="font-bold text-lg">ChatGPT</p>
           <RadioGroup
-            options={Object.entries(ChatGPTMode).map(([k, v]) => ({ label: `${k} Mode`, value: v }))}
+            options={Object.entries(ChatGPTMode).map(([k, v]) => ({ label: `${k} ${t('Mode')}`, value: v }))}
             value={userConfig.chatgptMode}
             onChange={(v) => updateConfigValue({ chatgptMode: v as ChatGPTMode })}
           />
@@ -145,6 +145,8 @@ function SettingPage() {
             <ChatGPTAzureSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : userConfig.chatgptMode === ChatGPTMode.Poe ? (
             <ChatGPTPoeSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
+          ) : userConfig.chatgptMode === ChatGPTMode.OpenRouter ? (
+            <ChatGPTOpenRouterSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : (
             <ChatGPWebSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           )}
@@ -152,7 +154,7 @@ function SettingPage() {
         <div className="flex flex-col gap-1">
           <p className="font-bold text-lg">Claude</p>
           <RadioGroup
-            options={Object.entries(ClaudeMode).map(([k, v]) => ({ label: `${k} Mode`, value: v }))}
+            options={Object.entries(ClaudeMode).map(([k, v]) => ({ label: `${k} ${t('Mode')}`, value: v }))}
             value={userConfig.claudeMode}
             onChange={(v) => updateConfigValue({ claudeMode: v as ClaudeMode })}
           />
@@ -160,6 +162,8 @@ function SettingPage() {
             <ClaudeAPISettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : userConfig.claudeMode === ClaudeMode.Webapp ? (
             <ClaudeWebappSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
+          ) : userConfig.claudeMode === ClaudeMode.OpenRouter ? (
+            <ClaudeOpenRouterSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           ) : (
             <ClaudePoeSettings userConfig={userConfig} updateConfigValue={updateConfigValue} />
           )}

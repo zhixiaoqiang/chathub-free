@@ -12,7 +12,7 @@ import {
   useRole,
 } from '@floating-ui/react'
 import { fileOpen } from 'browser-fs-access'
-import cx from 'classnames'
+import { cx } from '~/utils'
 import { FC, ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { GoBook, GoImage } from 'react-icons/go'
@@ -137,7 +137,10 @@ const ChatMessageInput: FC<Props> = (props) => {
   }, [])
 
   const selectImage = useCallback(async () => {
-    const file = await fileOpen({ mimeTypes: ['image/jpg', 'image/png', 'image/gif'] })
+    const file = await fileOpen({
+      mimeTypes: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'],
+      extensions: ['.jpg', '.jpeg', '.png', '.gif'],
+    })
     setImage(file)
     inputRef.current?.focus()
   }, [])
@@ -194,9 +197,7 @@ const ChatMessageInput: FC<Props> = (props) => {
           autoFocus={props.autoFocus}
         />
       </div>
-      {props.actionButton || (
-        <Button text="-" className="invisible" size={props.mode === 'full' ? 'normal' : 'small'} />
-      )}
+      {props.actionButton || <Button text="-" className="invisible" size={props.mode === 'full' ? 'normal' : 'tiny'} />}
     </form>
   )
 }

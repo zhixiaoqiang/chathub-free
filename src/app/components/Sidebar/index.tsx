@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import cx from 'classnames'
-import { useAtom } from 'jotai'
-import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { useAtom, useSetAtom } from 'jotai'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import allInOneIcon from '~/assets/all-in-one.svg'
 import collapseIcon from '~/assets/icons/collapse.svg'
@@ -11,8 +11,12 @@ import settingIcon from '~/assets/icons/setting.svg'
 import themeIcon from '~/assets/icons/theme.svg'
 import logo from '~/assets/logo.svg'
 import minimalLogo from '~/assets/minimal-logo.svg'
+import { cx } from '~/utils'
 import { useEnabledBots } from '~app/hooks/use-enabled-bots'
-import { sidebarCollapsedAtom } from '~app/state'
+import { showDiscountModalAtom, sidebarCollapsedAtom } from '~app/state'
+import { getPremiumActivation } from '~services/premium'
+import * as api from '~services/server-api'
+import { getAppOpenTimes, getPremiumModalOpenTimes } from '~services/storage/open-times'
 import CommandBar from '../CommandBar'
 import GuideModal from '../GuideModal'
 import ThemeSettingModal from '../ThemeSettingModal'
@@ -36,16 +40,33 @@ function Sidebar() {
   const [collapsed, setCollapsed] = useAtom(sidebarCollapsedAtom)
   const [themeSettingModalOpen, setThemeSettingModalOpen] = useState(false)
   const enabledBots = useEnabledBots()
+  const setShowDiscountModal = useSetAtom(showDiscountModalAtom)
+
+  useEffect(() => {
+    Promise.all([getAppOpenTimes(), getPremiumModalOpenTimes()]).then(async ([appOpenTimes, premiumModalOpenTimes]) => {
+      if (getPremiumActivation()) {
+        return
+      }
+      const { show } = await api.checkDiscount({ appOpenTimes, premiumModalOpenTimes })
+      if (show) {
+        setShowDiscountModal(true)
+      }
+    })
+  }, [])
+
   return (
-    <aside
+    <motion.aside
       className={cx(
         'flex flex-col bg-primary-background bg-opacity-40 overflow-hidden',
         collapsed ? 'items-center px-[15px]' : 'w-[230px] px-4',
       )}
     >
-      <img
+      <motion.img
         src={collapseIcon}
-        className={cx('w-6 h-6 cursor-pointer my-5', collapsed ? 'rotate-180' : 'self-end')}
+        className={cx('w-6 h-6 cursor-pointer my-5', !collapsed && 'self-end')}
+        animate={{
+          rotate: collapsed ? 180 : 0,
+        }}
         onClick={() => setCollapsed((c) => !c)}
       />
       {collapsed ? <img src={minimalLogo} className="w-[30px]" /> : <img src={logo} className="w-[79px]" />}
@@ -85,7 +106,7 @@ function Sidebar() {
             </Tooltip>
           )}
           {!collapsed && (
-            <Tooltip content={t('Theme')}>
+            <Tooltip content={t('Display')}>
               <a onClick={() => setThemeSettingModalOpen(true)}>
                 <IconButton icon={themeIcon} />
               </a>
@@ -100,8 +121,8 @@ function Sidebar() {
       </div>
       <CommandBar />
       <GuideModal />
-      {themeSettingModalOpen && <ThemeSettingModal open={true} onClose={() => setThemeSettingModalOpen(false)} />}
-    </aside>
+      <ThemeSettingModal open={themeSettingModalOpen} onClose={() => setThemeSettingModalOpen(false)} />
+    </motion.aside>
   )
 }
 

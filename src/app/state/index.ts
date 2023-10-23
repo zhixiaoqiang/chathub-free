@@ -1,7 +1,8 @@
+import { atom } from 'jotai'
 import { atomWithImmer } from 'jotai-immer'
-import { atomWithStorage } from 'jotai/utils'
-import { atomFamily } from 'jotai/utils'
-import { createBotInstance, BotId } from '~app/bots'
+import { atomFamily, atomWithStorage } from 'jotai/utils'
+import { BotId, createBotInstance } from '~app/bots'
+import { FeatureId } from '~app/components/Premium/FeatureList'
 import { getDefaultThemeColor } from '~app/utils/color-scheme'
 import { ChatMessageModel } from '~types'
 import { uuid } from '~utils'
@@ -23,7 +24,9 @@ export const chatFamily = atomFamily(
 )
 
 export const licenseKeyAtom = atomWithStorage('licenseKey', '', undefined, { unstable_getOnInit: true })
-export const sidebarCollapsedAtom = atomWithStorage('sidebarCollapsed', false)
+export const sidebarCollapsedAtom = atomWithStorage('sidebarCollapsed', false, undefined, { unstable_getOnInit: true })
 export const themeColorAtom = atomWithStorage('themeColor', getDefaultThemeColor())
 export const followArcThemeAtom = atomWithStorage('followArcTheme', false)
 export const sidePanelBotAtom = atomWithStorage<BotId>('sidePanelBot', 'chatgpt')
+export const showDiscountModalAtom = atom(false)
+export const showPremiumModalAtom = atom<false | true | FeatureId>(false)
