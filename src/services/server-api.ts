@@ -40,14 +40,23 @@ export async function createDiscount() {
   })
 }
 
+export interface Discount {
+  code: string
+  startTime: number
+  price: number
+  percent: number
+}
+
+export interface Campaign {
+  description: string
+  code: string
+  price: number
+}
+
 interface PurchaseInfo {
   price: number
-  discount?: {
-    code: string
-    startTime: number
-    price: number
-    percent: number
-  }
+  discount?: Discount
+  campaign?: Campaign
 }
 
 export async function fetchPurchaseInfo() {
@@ -55,5 +64,5 @@ export async function fetchPurchaseInfo() {
 }
 
 export async function checkDiscount(params: { appOpenTimes: number; premiumModalOpenTimes: number }) {
-  return ofetch<{ show: boolean }>('https://chathub.gg/api/premium/discount/check', { params })
+  return ofetch<{ show: boolean; campaign?: Campaign }>('https://chathub.gg/api/premium/discount/check', { params })
 }
