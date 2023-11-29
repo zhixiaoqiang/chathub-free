@@ -12,9 +12,10 @@ import qianwenLogo from '~/assets/qianwen-logo.png'
 import vicunaLogo from '~/assets/vicuna-logo.jpg'
 import wizardlmLogo from '~/assets/wizardlm-logo.png'
 import xunfeiLogo from '~/assets/xunfei-logo.png'
+import pplxLogo from '~/assets/pplx-logo.jpg'
 import { BotId } from './bots'
 
-export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
+export const CHATBOTS: Record<BotId, { name: string; avatar: string }> = {
   chatgpt: {
     name: 'ChatGPT',
     avatar: chatgptLogo,
@@ -34,6 +35,10 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
   llama: {
     name: 'Llama 2',
     avatar: llamaLogo,
+  },
+  perplexity: {
+    name: 'Perplexity',
+    avatar: pplxLogo,
   },
   vicuna: {
     name: 'Vicuna',
@@ -74,7 +79,7 @@ export const CHATBOTS: Record<BotId, { name: string; avatar: any }> = {
 }
 
 export const CHATGPT_HOME_URL = 'https://chat.openai.com'
-export const CHATGPT_API_MODELS = ['gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4', 'gpt-4-32k', 'gpt-4-turbo'] as const
+export const CHATGPT_API_MODELS = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-32k', 'gpt-4-turbo'] as const
 export const ALL_IN_ONE_PAGE_ID = 'all'
 
 export const DEFAULT_CHATGPT_SYSTEM_MESSAGE =

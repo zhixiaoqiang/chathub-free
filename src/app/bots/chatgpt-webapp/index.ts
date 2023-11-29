@@ -1,16 +1,33 @@
 import { get as getPath } from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
+import { getImageSize } from '~app/utils/image-size'
 import { ChatGPTWebModel } from '~services/user-config'
 import { ChatError, ErrorCode } from '~utils/errors'
 import { parseSSEResponse } from '~utils/sse'
 import { AbstractBot, SendMessageParams } from '../abstract-bot'
 import { getArkoseToken } from './arkose'
 import { chatGPTClient } from './client'
-import { ImageContent, ResponseContent } from './types'
-import { getImageSize } from '~app/utils/image-size'
+import { ImageContent, ResponseContent, ResponsePayload } from './types'
 
 function removeCitations(text: string) {
   return text.replaceAll(/\u3010\d+\u2020source\u3011/g, '')
+}
+
+function parseResponseContent(content: ResponseContent): { text?: string; image?: ImageContent } {
+  if (content.content_type === 'text') {
+    return { text: removeCitations(content.parts[0]) }
+  }
+  if (content.content_type === 'code') {
+    return { text: '_' + content.text + '_' }
+  }
+  if (content.content_type === 'multimodal_text') {
+    for (const part of content.parts) {
+      if (part.content_type === 'image_asset_pointer') {
+        return { image: part }
+      }
+    }
+  }
+  return {}
 }
 
 interface ConversationContext {
@@ -33,6 +50,27 @@ export class ChatGPTWebBot extends AbstractBot {
     return 'text-davinci-002-render-sha'
   }
 
+  private async uploadImage(image: File): Promise<ImageContent> {
+    const fileId = await chatGPTClient.uploadFile(this.accessToken!, image)
+    const size = await getImageSize(image)
+    return {
+      asset_pointer: `file-service://${fileId}`,
+      width: size.width,
+      height: size.height,
+      size_bytes: image.size,
+    }
+  }
+
+  private buildMessage(prompt: string, image?: ImageContent) {
+    return {
+      id: uuidv4(),
+      author: { role: 'user' },
+      content: image
+        ? { content_type: 'multimodal_text', parts: [image, prompt] }
+        : { content_type: 'text', parts: [prompt] },
+    }
+  }
+
   async doSendMessage(params: SendMessageParams) {
     if (!this.accessToken) {
       this.accessToken = await chatGPTClient.getAccessToken()
@@ -45,14 +83,7 @@ export class ChatGPTWebBot extends AbstractBot {
 
     let image: ImageContent | undefined = undefined
     if (params.image) {
-      const fileId = await chatGPTClient.uploadFile(this.accessToken, params.image)
-      const size = await getImageSize(params.image)
-      image = {
-        asset_pointer: `file-service://${fileId}`,
-        width: size.width,
-        height: size.height,
-        size_bytes: params.image.size,
-      }
+      image = await this.uploadImage(params.image)
     }
 
     const resp = await chatGPTClient.fetch('https://chat.openai.com/backend-api/conversation', {
@@ -64,19 +95,12 @@ export class ChatGPTWebBot extends AbstractBot {
       },
       body: JSON.stringify({
         action: 'next',
-        messages: [
-          {
-            id: uuidv4(),
-            author: { role: 'user' },
-            content: image
-              ? { content_type: 'multimodal_text', parts: [image, params.prompt] }
-              : { content_type: 'text', parts: [params.prompt] },
-          },
-        ],
+        messages: [this.buildMessage(params.prompt, image)],
         model: modelName,
         conversation_id: this.conversationContext?.conversationId || undefined,
         parent_message_id: this.conversationContext?.lastMessageId || uuidv4(),
         arkose_token: arkoseToken,
+        conversation_mode: { kind: 'primary_assistant' },
       }),
     })
 
@@ -88,45 +112,37 @@ export class ChatGPTWebBot extends AbstractBot {
         params.onEvent({ type: 'DONE' })
         return
       }
-      let data
+      let parsed: ResponsePayload | { message: null; error: string }
       try {
-        data = JSON.parse(message)
+        parsed = JSON.parse(message)
       } catch (err) {
         console.error(err)
         return
       }
-      if (!data.message && data.error) {
+      if (!parsed.message && parsed.error) {
         params.onEvent({
           type: 'ERROR',
-          error: new ChatError(data.error, ErrorCode.UNKOWN_ERROR),
+          error: new ChatError(parsed.error, ErrorCode.UNKOWN_ERROR),
         })
         return
       }
-      if (getPath(data, 'message.author.role') !== 'assistant') {
+
+      const payload = parsed as ResponsePayload
+
+      const role = getPath(payload, 'message.author.role')
+      if (role !== 'assistant' && role !== 'tool') {
         return
       }
-      const content = data.message?.content as ResponseContent | undefined
+
+      const content = payload.message?.content as ResponseContent | undefined
       if (!content) {
         return
       }
-      let text: string
-      if (content.content_type === 'text') {
-        text = content.parts[0]
-        text = removeCitations(text)
-      } else if (content.content_type === 'code') {
-        text = '_' + content.text + '_'
-      } else {
-        return
-      }
+
+      const { text } = parseResponseContent(content)
       if (text) {
-        this.conversationContext = {
-          conversationId: data.conversation_id,
-          lastMessageId: data.message.id,
-        }
-        params.onEvent({
-          type: 'UPDATE_ANSWER',
-          data: { text },
-        })
+        this.conversationContext = { conversationId: payload.conversation_id, lastMessageId: payload.message.id }
+        params.onEvent({ type: 'UPDATE_ANSWER', data: { text } })
       }
     }).catch((err: Error) => {
       if (err.message.includes('token_expired')) {
@@ -148,5 +164,9 @@ export class ChatGPTWebBot extends AbstractBot {
 
   get name() {
     return `ChatGPT (webapp/${this.model})`
+  }
+
+  get supportsImageInput() {
+    return true
   }
 }

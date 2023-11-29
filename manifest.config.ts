@@ -1,12 +1,12 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
-export default defineManifest(async (env) => {
+export default defineManifest(async () => {
   return {
     manifest_version: 3,
     name: '__MSG_appName__',
     description: '__MSG_appDesc__',
     default_locale: 'en',
-    version: '1.39.2',
+    version: '1.41.0',
     icons: {
       '16': 'src/assets/icon.png',
       '32': 'src/assets/icon.png',
@@ -71,6 +71,11 @@ export default defineManifest(async (env) => {
           id: 'ruleset_baichuan',
           enabled: true,
           path: 'src/rules/baichuan.json',
+        },
+        {
+          id: 'ruleset_pplx',
+          enabled: true,
+          path: 'src/rules/pplx.json',
         },
       ],
     },
