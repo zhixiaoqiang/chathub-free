@@ -4,7 +4,7 @@ import { BingWebBot } from './bing'
 import { ChatGPTBot } from './chatgpt'
 import { ClaudeBot } from './claude'
 import { LMSYSBot } from './lmsys'
-import { PerplexityLabsBot } from './perplexity'
+import { PerplexityBot } from './perplexity'
 import { PiBot } from './pi'
 import { QianwenWebBot } from './qianwen'
 import { XunfeiBot } from './xunfei'
@@ -25,6 +25,7 @@ export type BotId =
   | 'wizardlm'
   | 'qianwen'
   | 'baichuan'
+  | 'yi'
 
 export function createBotInstance(botId: BotId) {
   switch (botId) {
@@ -50,6 +51,8 @@ export function createBotInstance(botId: BotId) {
       return new LMSYSBot('falcon-180b-chat')
     case 'mistral':
       return new LMSYSBot('mistral-7b-instruct')
+    case 'yi':
+      return new LMSYSBot('yi-34b-chat')
     case 'pi':
       return new PiBot()
     case 'qianwen':
@@ -57,7 +60,7 @@ export function createBotInstance(botId: BotId) {
     case 'baichuan':
       return new BaichuanWebBot()
     case 'perplexity':
-      return new PerplexityLabsBot('pplx-70b-online')
+      return new PerplexityBot()
   }
 }
 

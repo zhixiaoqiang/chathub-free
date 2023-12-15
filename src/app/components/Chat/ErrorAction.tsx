@@ -8,7 +8,7 @@ import Button, { Props as ButtonProps } from '../Button'
 import MessageBubble from './MessageBubble'
 
 const ActionButton: FC<ButtonProps> = (props) => {
-  return <Button {...props} size="small" className="drop-shadow-lg" color="primary" />
+  return <Button {...props} size="small" className="font-medium underline" color="primary" />
 }
 
 const ChatGPTAuthErrorAction = () => {
@@ -109,6 +109,13 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
       </a>
     )
   }
+  if (error.code === ErrorCode.BARD_UNAUTHORIZED) {
+    return (
+      <a href="https://bard.google.com" target="_blank" rel="noreferrer">
+        <ActionButton text={t('Login to bard.google.com')} />
+      </a>
+    )
+  }
   if (error.code === ErrorCode.CHATGPT_CLOUDFLARE || error.code === ErrorCode.CHATGPT_UNAUTHORIZED) {
     return <ChatGPTAuthErrorAction />
   }
@@ -145,6 +152,17 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
         Please visit{' '}
         <a href="https://chat.lmsys.org" target="_blank" rel="noreferrer" className="underline">
           LMSYS.org
+        </a>{' '}
+        and try again
+      </p>
+    )
+  }
+  if (error.code === ErrorCode.PPLX_FORBIDDEN_ERROR) {
+    return (
+      <p className="ml-2 text-secondary-text text-sm">
+        Please visit{' '}
+        <a href="https://labs.perplexity.ai" target="_blank" rel="noreferrer" className="underline">
+          labs.perplexity.ai
         </a>{' '}
         and try again
       </p>
