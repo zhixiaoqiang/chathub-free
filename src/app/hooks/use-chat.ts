@@ -2,6 +2,7 @@ import { useAtom } from 'jotai'
 import { useCallback, useEffect, useMemo } from 'react'
 import { trackEvent } from '~app/plausible'
 import { chatFamily } from '~app/state'
+import { compressImageFile } from '~app/utils/image-compression'
 import { setConversationMessages } from '~services/chat-history'
 import { ChatMessageModel } from '~types'
 import { uuid } from '~utils'
@@ -26,7 +27,7 @@ export function useChat(botId: BotId) {
 
   const sendMessage = useCallback(
     async (input: string, image?: File) => {
-      trackEvent('send_message', { botId, withImage: !!image })
+      trackEvent('send_message', { botId, withImage: !!image, name: chatState.bot.name })
 
       const botMessageId = uuid()
       setChatState((draft) => {
@@ -42,9 +43,14 @@ export function useChat(botId: BotId) {
         draft.abortController = abortController
       })
 
+      let compressedImage: File | undefined = undefined
+      if (image) {
+        compressedImage = await compressImageFile(image)
+      }
+
       const resp = await chatState.bot.sendMessage({
         prompt: input,
-        image,
+        image: compressedImage,
         signal: abortController.signal,
       })
 

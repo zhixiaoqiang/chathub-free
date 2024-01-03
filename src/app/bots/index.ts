@@ -3,6 +3,8 @@ import { BardBot } from './bard'
 import { BingWebBot } from './bing'
 import { ChatGPTBot } from './chatgpt'
 import { ClaudeBot } from './claude'
+import { GeminiBot } from './gemini-api'
+import { GrokWebBot } from './grok'
 import { LMSYSBot } from './lmsys'
 import { PerplexityBot } from './perplexity'
 import { PiBot } from './pi'
@@ -26,6 +28,8 @@ export type BotId =
   | 'qianwen'
   | 'baichuan'
   | 'yi'
+  | 'grok'
+  | 'gemini'
 
 export function createBotInstance(botId: BotId) {
   switch (botId) {
@@ -50,7 +54,7 @@ export function createBotInstance(botId: BotId) {
     case 'falcon':
       return new LMSYSBot('falcon-180b-chat')
     case 'mistral':
-      return new LMSYSBot('mistral-7b-instruct')
+      return new LMSYSBot('mixtral-8x7b-instruct-v0.1')
     case 'yi':
       return new LMSYSBot('yi-34b-chat')
     case 'pi':
@@ -61,6 +65,10 @@ export function createBotInstance(botId: BotId) {
       return new BaichuanWebBot()
     case 'perplexity':
       return new PerplexityBot()
+    case 'grok':
+      return new GrokWebBot()
+    case 'gemini':
+      return new GeminiBot()
   }
 }
 

@@ -112,7 +112,14 @@ const ErrorAction: FC<{ error: ChatError }> = ({ error }) => {
   if (error.code === ErrorCode.BARD_UNAUTHORIZED) {
     return (
       <a href="https://bard.google.com" target="_blank" rel="noreferrer">
-        <ActionButton text={t('Login to bard.google.com')} />
+        <ActionButton text={t('Login to Bard')} />
+      </a>
+    )
+  }
+  if (error.code === ErrorCode.TWITTER_UNAUTHORIZED) {
+    return (
+      <a href="https://twitter.com" target="_blank" rel="noreferrer">
+        <ActionButton text={t('Login to Twitter')} />
       </a>
     )
   }

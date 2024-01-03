@@ -63,7 +63,7 @@
   "View history": "履歴を表示する",
   "Premium Feature": "プレミアム機能",
   "Upgrade to unlock": "アップグレードしてロックを解除する",
-  "Please check your network connection": "ネットワーク接続を確認してください。中国のユーザーは科学上の必要がある場合があります",
+  "Please check your network connection": "ネットワーク接続を確認してください",
   "Display size": "表示サイズ",
   "You’ve reached the daily free message limit for this model": "このモデルの1日の無料メッセージ制限に達しました",
   "This is a limitation set by poe.com": "これはpoe.comによって設定された制限です",
@@ -94,5 +94,10 @@
   "TODAY ONLY": "今日限り",
   "Get Discount": "割引を入手する",
   "Webapp mode uses your login session in current browser": "Webアプリモードでは、現在のブラウザでのログインセッションが使用されます",
-  "Your keys are stored locally": "キーはローカルに保存されます"
+  "Your keys are stored locally": "キーはローカルに保存されます",
+  "Login to Claude.ai": "Claude.aiにログインする",
+  "Login to Bard": "Bardにログインする",
+  "Recent Updates": "最近の更新",
+  "Added a separate Gemini Pro bot, can be enabled in the settings": "独立したGemini Proボットを追加しました。設定で有効にできます",
+  "Save changes": "変更を保存する"
 }
