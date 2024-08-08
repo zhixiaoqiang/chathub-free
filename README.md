@@ -9,15 +9,18 @@
 ### Install
 
 <a href="https://chrome.google.com/webstore/detail/chathub-all-in-one-chatbo/iaakpnchhognanibcahlpcplchdfmgma?utm_source=github"><img src="https://user-images.githubusercontent.com/64502893/231991498-8df6dd63-727c-41d0-916f-c90c15127de3.png" width="200" alt="Get ChatHub for Chromium"></a>
-<a href="https://microsoftedge.microsoft.com/addons/detail/chathub-allinone-chat/kdlmggoacmfoombiokflpeompajfljga?utm_source=github"><img src="https://user-images.githubusercontent.com/64502893/231991158-1b54f831-2fdc-43b6-bf9a-f894000e5aa8.png" width="160" alt="Get ChatHub for Microsoft Edge"></a>
 
 </div>
 
 ## 📷 Screenshot
 
-![Screenshot](screenshots/extension.png?raw=true#gh-light-mode-only)
+![Screenshot](screenshots/extension.png?raw=true)
 
-![Screenshot (Dark Mode)](screenshots/dark.png?raw=true#gh-dark-mode-only)
+## 🤝 Sponsors
+
+<a href="https://getstream.io/chat/sdk/react/?utm_source=github&utm_medium=referral&utm_content=&utm_campaign=wong2">
+  <img src="screenshots/stream-logo.jpg" width="200" />
+</a>
 
 ## ✨ Features
 
