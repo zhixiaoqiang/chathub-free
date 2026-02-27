@@ -38,18 +38,13 @@
 
 ## 🤖 Supported Bots
 
-- ChatGPT (via Webapp/API/Azure/Poe)
-- Bing Chat
-- Google Bard
-- Claude 2 (via Webapp/API/Poe)
-- LLaMA 2
-- ChatGLM
-- Pi by Inflection
-- Vicuna
-- WizardLM
-- iFlytek Spark
-- Tongyi Qianwen
-- Baichuan
+- ChatGPT (via Webapp/API)
+- Gemini
+- Claude (via Webapp/API)
+- Grok
+- DeepSeek
+- Qianwen
+- Llama
 - ...
 
 ## 🔨 Build from Source
